@@ -1,7 +1,6 @@
 <template>
-  <div class="container max-w-[1256px] mx-auto p-2">
-    <SearchSection />
-    <div v-if="loader" class="mt-32 flex justify-center items-center">
+  <div class="container max-w-[1256px] mx-auto p-2 h-[100vh]">
+    <div v-if="loader" class="flex justify-center items-center h-full">
       <svg
         role="status"
         class="
@@ -27,38 +26,46 @@
         />
       </svg>
     </div>
-    <div v-else>
-      <ListSection :movieList="movieList" />
-      <PaginateSection />
+    <div class="h-full" v-else>
+      <HeaderSection :title="details.title" :tag="details.tagline" />
+      <DetailsSection :details="details" :credits="credits" />
     </div>
   </div>
 </template>
 
 <script>
-import SearchSection from "@/components/movies/list/SearchSection.vue";
-import PaginateSection from "@/components/movies/list/PaginateSection.vue";
-import ListSection from "@/components/movies/list/ListSection.vue";
+import HeaderSection from "@/components/movies/details/HeaderSection.vue";
+import DetailsSection from "@/components/movies/details/DetailsSection.vue";
+import { useRoute } from "vue-router";
 
-import { computed, onBeforeMount } from "vue";
-import { useStore } from "vuex";
+import { getMovieDetails, getMovieCredits } from "@/services/moviesApi";
+import { onBeforeMount, ref } from "@vue/runtime-core";
 export default {
   components: {
-    SearchSection,
-    ListSection,
-    PaginateSection,
+    HeaderSection,
+    DetailsSection,
   },
   setup() {
-    const store = useStore();
-    const loader = computed(() => store.getters.loader);
-    const movieList = computed(() => store.getters.movieList);
+    const route = useRoute();
+    const details = ref("");
+    const credits = ref("");
+    const loader = ref(true);
 
     onBeforeMount(async () => {
-      await store.dispatch("fetchGnereList");
-      await store.dispatch("fetchMovieList", store.state.paginate.page);
+      try {
+        const responseDetails = await getMovieDetails(route.params.id);
+        const responseCredits = await getMovieCredits(route.params.id);
+        details.value = responseDetails.data;
+        credits.value = responseCredits.data.cast.sort((a, b) => {
+          return b.popularity - a.popularity;
+        });
+        loader.value = false;
+      } catch (err) {}
     });
 
     return {
-      movieList,
+      details,
+      credits,
       loader,
     };
   },
