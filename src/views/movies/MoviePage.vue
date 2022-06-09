@@ -34,11 +34,14 @@
 </template>
 
 <script>
+// components
 import HeaderSection from "@/components/movies/details/HeaderSection.vue";
 import DetailsSection from "@/components/movies/details/DetailsSection.vue";
 import { useRoute } from "vue-router";
 
+// services
 import { getMovieDetails, getMovieCredits } from "@/services/moviesApi";
+
 import { onBeforeMount, ref } from "@vue/runtime-core";
 export default {
   components: {
@@ -56,11 +59,14 @@ export default {
         const responseDetails = await getMovieDetails(route.params.id);
         const responseCredits = await getMovieCredits(route.params.id);
         details.value = responseDetails.data;
+        // sort credits base on popularity
         credits.value = responseCredits.data.cast.sort((a, b) => {
           return b.popularity - a.popularity;
         });
         loader.value = false;
-      } catch (err) {}
+      } catch (err) {
+        alert(err);
+      }
     });
 
     return {

@@ -70,7 +70,6 @@
 export default {
   name: "list-section",
   props: ["movieList"],
-  setup(props) {},
 };
 </script>
 
