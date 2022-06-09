@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import { getMovies, getGenres } from '@/services/moviesApi'
+import { getMovies, getGenres, searchMovie } from '@/services/moviesApi'
 const store = createStore({
     state: {
         movies: {},
@@ -11,7 +11,10 @@ const store = createStore({
         }
     },
     getters: {
+
         movieList(state) {
+            // check gneres ids and gneres list and fetch gneres names
+            // then return needed data {id , title , releaseDate , picture , gnereList}
             if (state.movies.data.results != undefined) {
                 const movieList = [];
                 state.movies.data.results.forEach((movie) => {
@@ -34,9 +37,11 @@ const store = createStore({
                 return movieList;
             }
         },
+
         paginate(state) {
             return state.paginate
         },
+
         loader(state) {
             return state.loader
         }
@@ -57,6 +62,7 @@ const store = createStore({
         }
     },
     actions: {
+
         async fetchMovieList(contex, payload) {
             contex.commit('setLoader', true);
             try {
@@ -65,7 +71,7 @@ const store = createStore({
                 contex.commit('setPaginate', response.data)
                 contex.commit('setLoader', false);
             } catch (err) {
-                console.log(err)
+
             }
         },
 
@@ -74,7 +80,19 @@ const store = createStore({
                 let response = await getGenres()
                 contex.commit('setGnereList', response)
             } catch (err) {
-                console.log(err)
+
+            }
+        },
+
+        async fetchSearch(contex, payload) {
+            contex.commit('setLoader', true);
+            try {
+                let response = await searchMovie(payload);
+                contex.commit('setMovieList', response);
+                contex.commit('setPaginate', response.data)
+                contex.commit('setLoader', false);
+            } catch (err) {
+
             }
         }
     }

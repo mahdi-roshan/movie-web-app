@@ -27,7 +27,12 @@
         </li>
         <li class="flex justify-between items-center">
           <span class="font-bold">Runtime</span
-          ><span class="font-semibold">{{ (parseInt(details.runtime / 60)) + ' h ' + (details.runtime % 60) + ' m'}}</span>
+          ><span class="font-semibold">{{
+            parseInt(details.runtime / 60) +
+            " h " +
+            (details.runtime % 60) +
+            " m"
+          }}</span>
         </li>
         <li class="flex justify-between items-center">
           <span class="font-bold">Score</span>
@@ -90,8 +95,9 @@ export default {
   props: ["details", "credits"],
   setup(props) {
     let credits = reactive([]);
+    // show only 10 of casts
     credits = props.credits.slice(0, 11);
-    console.log(credits);
+
     return {
       credits,
     };

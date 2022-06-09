@@ -28,7 +28,13 @@
       </svg>
     </div>
     <div v-else>
-      <ListSection :movieList="movieList" />
+      <div
+        v-if="movieList.length == 0"
+        class="mt-32 flex justify-center items-center"
+      >
+        <h5 class="font-bold text-xl">There is no data</h5>
+      </div>
+      <ListSection v-else :movieList="movieList" />
       <PaginateSection />
     </div>
   </div>
@@ -39,7 +45,7 @@ import SearchSection from "@/components/movies/list/SearchSection.vue";
 import PaginateSection from "@/components/movies/list/PaginateSection.vue";
 import ListSection from "@/components/movies/list/ListSection.vue";
 
-import { computed, onBeforeMount } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 import { useStore } from "vuex";
 export default {
   components: {
@@ -53,8 +59,12 @@ export default {
     const movieList = computed(() => store.getters.movieList);
 
     onBeforeMount(async () => {
-      await store.dispatch("fetchGnereList");
-      await store.dispatch("fetchMovieList", store.state.paginate.page);
+      try {
+        await store.dispatch("fetchGnereList");
+        await store.dispatch("fetchMovieList", store.state.paginate.page);
+      } catch (err) {
+        alert(err)
+      }
     });
 
     return {
